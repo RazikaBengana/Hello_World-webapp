@@ -2,30 +2,42 @@ package render
 
 import (
 	"bytes"
+	"github.com/RazikaBengana/Hello_World-webapp/pkg/config"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 )
 
+var functions = template.FuncMap{}
+
+var app *config.AppConfig
+
+// NewTemplates sets the config for the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
+
 // RenderTemplate renders a specified template file
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	// Create a template cache
-	tc, err := CreateTemplateCache()
-	if err != nil {
-		log.Fatal(err)
+	var tc map[string]*template.Template
+	if app.UseCache {
+		// Get the template cache from the app config
+		tc = app.TemplateCache
+	} else {
+		tc, _ = CreateTemplateCache()
 	}
 
 	// Get requested template from cache
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get template from template cache")
 	}
 
 	// Create a new buffer to hold the rendered template
 	buf := new(bytes.Buffer)
 
-	err = t.Execute(buf, nil)
+	err := t.Execute(buf, nil)
 	if err != nil {
 		log.Println(err)
 	}
