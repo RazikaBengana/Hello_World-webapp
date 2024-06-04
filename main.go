@@ -15,6 +15,3 @@ func main() {
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
 	_ = http.ListenAndServe(portNumber, nil)
 }
-
-// Functions that begin with a capital letter are accessible outside their package
-// (not applicable for the main package)
