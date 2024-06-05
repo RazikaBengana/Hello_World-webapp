@@ -2,7 +2,9 @@ package render
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/RazikaBengana/Hello_World-webapp/pkg/config"
+	"github.com/RazikaBengana/Hello_World-webapp/pkg/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -18,8 +20,13 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+// AddDefaultData adds default data to TemplateData structure before rendering
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
 // RenderTemplate renders a specified template file
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		// Get the template cache from the app config
@@ -37,15 +44,14 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	// Create a new buffer to hold the rendered template
 	buf := new(bytes.Buffer)
 
-	err := t.Execute(buf, nil)
-	if err != nil {
-		log.Println(err)
-	}
+	td = AddDefaultData(td)
+
+	_ = t.Execute(buf, td)
 
 	// Render the template
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	if err != nil {
-		log.Println(err)
+		fmt.Println("Error writing template to browser", err)
 	}
 }
 
@@ -62,7 +68,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	// Range through all files ending with *.page.tmpl
 	for _, page := range pages {
 		name := filepath.Base(page)
-		ts, err := template.New(name).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return myCache, err
 		}
