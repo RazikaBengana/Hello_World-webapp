@@ -14,6 +14,7 @@ func routes(app *config.AppConfig) http.Handler {
 
 	mux.Use(middleware.Recoverer) // Add middleware to recover from panics and return a 500 error
 	mux.Use(NoSurf)               // Add CSRF protection middleware to all routes
+	mux.Use(SessionLoad)          // Load and save the session on every request
 
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)

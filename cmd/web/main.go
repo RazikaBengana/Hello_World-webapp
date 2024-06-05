@@ -5,16 +5,33 @@ import (
 	"github.com/RazikaBengana/Hello_World-webapp/pkg/config"
 	"github.com/RazikaBengana/Hello_World-webapp/pkg/handlers"
 	"github.com/RazikaBengana/Hello_World-webapp/pkg/render"
+	"github.com/alexedwards/scs/v2"
 	"log"
 	"net/http"
+	"time"
 )
 
 const portNumber = ":8080"
 
+var app config.AppConfig
+var session *scs.SessionManager
+
 // main is the entry point for the application
 func main() {
-	var app config.AppConfig
+	// Change this to true when in production to enforce secure settings
+	app.InProduction = false
 
+	// Initialize the session manager with a 24-hour session lifetime
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = app.InProduction
+
+	// Store the session manager in the app config
+	app.Session = session
+
+	// Create a template cache for rendering HTML templates
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")
