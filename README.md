@@ -253,7 +253,7 @@ This separation of concerns ensures that the application is modular, making it e
 
 <br>
 
-**${\color{blue}Razika \space Bengana}$**
+<img src="https://img.shields.io/badge/Razika%20Bengana-darkblue" alt="Razika Bengana" width="120">
 
 <br>
 <br>
